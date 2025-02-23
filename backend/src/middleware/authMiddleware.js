@@ -1,7 +1,7 @@
 /**
  * Authentication Middleware
- * Protects private routes by verifying JWT tokens.
- * If a valid token is present in the request header, it attaches user to `req.user`.
+ * Protects private routes by verifying JWT tokens
+ * If a valid token is present in the request header, it attaches user to `req.user`
  */
 
 const jwt = require('jsonwebtoken');

@@ -1,5 +1,7 @@
 // Update with your config settings.
 
+const { search } = require("./src/app");
+
 /**
  * @type { Object.<string, import("knex").Knex.Config> }
  */
@@ -8,6 +10,7 @@ require('dotenv').config(); // Load environment variables
 module.exports = {
   development: {
     client: "pg",  // Use PostgreSQL
+    searchPath: "public",
     connection: process.env.DATABASE_URL,  // Use the connection string from .env
     pool: {
       min: 2,

@@ -1,7 +1,7 @@
 /**
  * Authentication Controller
- * Handles user registration and login.
- * Uses bcrypt for password hashing and JWT for authentication.
+ * Handles user registration and login
+ * Uses bcrypt for password hashing and JWT for authentication
  */
 
 const bcrypt = require('bcryptjs');
@@ -22,8 +22,7 @@ exports.register = async (req, res) => {
         }
 
         // Hash the password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         // Save the user to the database
         const newUser = await pool.query(
@@ -31,9 +30,14 @@ exports.register = async (req, res) => {
             [username, hashedPassword]
         );
 
-        res.status(201).json({ message: 'User created/registered successfully', user: newUser.rows[0] });
+        // Generate JWT token immediately after registration
+        const token = jwt.sign({ id: newUser.rows[0].id, username: newUser.rows[0].username }, JWT_SECRET, {
+            expiresIn: "1h",
+        });
+
+        res.status(201).json({ message: 'User registered successfully', token });
     } catch (error) {
-        res.status(500).json({ error: error.message && "Server error: Unable to register User" });
+        res.status(500).json({ error: error.message || "Server error: Unable to register user" });
     }
 };
 
@@ -43,7 +47,7 @@ exports.login = async (req, res) => {
   
     try {
       // Check if the user exists
-      const userResult = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
+      const userResult = await pool.query("SELECT * FROM public.users WHERE username = $1", [username]);
       const user = userResult.rows[0];
   
       if (!user) {
