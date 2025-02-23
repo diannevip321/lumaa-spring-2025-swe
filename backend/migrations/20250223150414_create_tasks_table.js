@@ -7,7 +7,8 @@ exports.up = function (knex) {
       table.integer("userId").unsigned().references("id").inTable("users").onDelete("CASCADE");
     });
   };
-
+  
   exports.down = function (knex) {
     return knex.schema.dropTable("tasks");
-  }
+  };
+  

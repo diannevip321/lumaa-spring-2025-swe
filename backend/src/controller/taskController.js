@@ -3,7 +3,7 @@
  * Handles task creation, fetching, updating, and deletion.
  */
 
-const pool = require("./config/db");
+const pool = require("../config/db");
 
 // Fetch all tasks for the authenticated user
 exports.getTasks = async (req, res) => {
@@ -22,16 +22,27 @@ exports.createTask = async (req, res) => {
     const { title, description } = req.body;
     const userId = req.user.id;
 
-    try{
-        const newTask = await pool.query(
-            "INSERT INTO public.tasks (title, description, isComplete, userId) VALUES ($1, $2, $3, $4) RETURNING *",
-            [title, description, false, userId]
-        )
+    try {
+        console.log("🚨 DEBUG: Running INSERT query...");
+        console.log("🚨 DEBUG: Title:", title, "Description:", description, "UserID:", userId);
+
+        // Manually construct the query string
+        const queryString = "INSERT INTO public.tasks (title, description, isComplete, userId) VALUES ($1, $2, $3, $4) RETURNING *";
+
+        console.log("🚨 DEBUG: Query String ->", queryString);
+
+        const newTask = await pool.query(queryString, [title, description, false, userId]);
+
+        console.log("🚨 DEBUG: Query executed successfully ->", newTask.rows[0]);
+
         res.status(201).json(newTask.rows[0]);
     } catch (error) {
+        console.error("🚨 ERROR:", error.message);
         res.status(500).json({ error: error.message || "Unable to create task" });
     }
 };
+
+
 
 // Update a task for the authenticated user
 exports.updateTask = async (req, res) => {
